@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 
 // https://adventofcode.com/2022/day/1
 
@@ -49,7 +50,39 @@ carrying?
 
 int main()
 {
-	printf("Hello World");
+	FILE* fp = fopen("1/input.txt", "r");
+	char *line = NULL;
+	size_t len = 0;
+	ssize_t read;
 
-	return 0;
+	if (NULL == fp) {
+		exit(EXIT_FAILURE);
+	}
+
+	int elfTotalCalories = 0;
+	int elves[1];
+	int currentElf = 0;
+	while ((read = getline(&line, &len, fp)) != -1) {
+		if (read == 1) {
+			// End of current eld's snacks
+			elves[currentElf] = elfTotalCalories;
+			currentElf++;
+			elfTotalCalories = 0;
+		} else {
+			// Elf has more snacks to document, yum!
+			int snackCalories = atoi(line);
+			elfTotalCalories += snackCalories;
+		}
+	}
+	free(line);
+	fclose(fp);
+
+	int maxCalories = 0;
+	for (int i = 0; i < currentElf; i++) {
+		if (elves[i] > maxCalories) {
+			maxCalories = elves[i];
+		}
+	}
+	printf("%d\n", maxCalories);
+	exit(EXIT_SUCCESS);
 }
