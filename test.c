@@ -3,16 +3,14 @@
 
 FILE *open(int argc, char *argv[])
 {
-	if (argc < 2)
-	{
+	if (argc < 2) {
 		printf("No file specified!\n");
 		exit(EXIT_FAILURE);
 	}
 
 	FILE *fp = fopen(argv[1], "r");
 
-	if (NULL == fp)
-	{
+	if (NULL == fp) {
 		printf("Oops, cannot read file\n");
 		exit(EXIT_FAILURE);
 	}
