@@ -65,24 +65,51 @@ Elves carrying in total?
 
 */
 
-int main()
+FILE *open(int argc, char *argv[])
 {
-	FILE* fp = fopen("1/input.txt", "r");
-	char *line = NULL;
-	size_t len = 0;
-	ssize_t read;
-
-	if (NULL == fp) {
+	if (argc < 2)
+	{
+		printf("No file specified!\n");
 		exit(EXIT_FAILURE);
 	}
 
+	FILE *fp = fopen(argv[1], "r");
+
+	if (NULL == fp)
+	{
+		printf("Oops, cannot read file\n");
+		exit(EXIT_FAILURE);
+	}
+
+	return fp;
+}
+
+int cmpfunc (const void* a, const void* b) {
+	return ( *(int*)b - *(int*)a );
+}
+
+int main(int argc, char *argv[])
+{
+	FILE *fp = open(argc, argv);
+
+	char *line = NULL;
+	size_t linecap = 0;
+	ssize_t linelen;
+
 	int elfTotalCalories = 0;
-	int elves[1];
+	int* elves = malloc(sizeof elves);
 	int currentElf = 0;
-	while ((read = getline(&line, &len, fp)) != -1) {
-		if (read == 1) {
+	while ((linelen = getline(&line, &linecap, fp)) > 0) {
+		if (linelen == 1) {
 			// End of current eld's snacks
+			int *tmp = realloc(elves, (currentElf + 2) * sizeof elves);
+			if (tmp) {
+				elves = tmp;
+			} else {
+				exit(EXIT_FAILURE);
+			}
 			elves[currentElf] = elfTotalCalories;
+			//printf("elf has %d total %d\n", elves[currentElf], elfTotalCalories);
 			currentElf++;
 			elfTotalCalories = 0;
 		} else {
@@ -94,12 +121,11 @@ int main()
 	free(line);
 	fclose(fp);
 
-	int maxCalories = 0;
-	for (int i = 0; i < currentElf; i++) {
-		if (elves[i] > maxCalories) {
-			maxCalories = elves[i];
-		}
-	}
-	printf("%d\n", maxCalories);
+	qsort(elves, currentElf + 1, sizeof(int), cmpfunc);
+
+	//printf("%d\n", elves[0]);
+	//printf("%d\n", elves[1]);
+	//printf("%d\n", elves[2]);
+	printf("%d\n", elves[0] + elves[1] + elves[2]);
 	exit(EXIT_SUCCESS);
 }
